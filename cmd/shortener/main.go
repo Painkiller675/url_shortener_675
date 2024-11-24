@@ -35,7 +35,7 @@ func mainPage(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func getUrlHandler(res http.ResponseWriter, req *http.Request) {
+func getURLHandler(res http.ResponseWriter, req *http.Request) {
 	// method checking
 	if req.Method != http.MethodGet {
 		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -67,7 +67,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", mainPage)
-	mux.HandleFunc("/{id}", getUrlHandler)
+	mux.HandleFunc("/{id}", getURLHandler)
 	//mux.HandleFunc("GET /{id}", func(res http.ResponseWriter, req *http.Request) {
 	//	id := req.PathValue("id")
 	//	fmt.Fprintf(res, "using URL with id=%v\n", id)
