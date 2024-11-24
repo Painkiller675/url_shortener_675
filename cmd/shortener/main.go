@@ -30,7 +30,7 @@ func mainPage(res http.ResponseWriter, req *http.Request) {
 	res.WriteHeader(http.StatusCreated) // 201
 	_, err = res.Write([]byte("http://localhost:8080/EwHXdJfB"))
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 }
@@ -54,11 +54,11 @@ func getURLHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	// response molding
-	res.Header().Set("Location", "https://practicum.yandex.ru/; charset=utf-8")
+	res.Header().Set("Location", "https://practicum.yandex.ru/")
 	res.WriteHeader(http.StatusTemporaryRedirect) // 307
 	_, err := res.Write([]byte("123"))            // TODO is it a CORRECT response???
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 }
