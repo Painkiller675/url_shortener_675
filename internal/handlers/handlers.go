@@ -14,10 +14,10 @@ func CreateShortURLHandler(res http.ResponseWriter, req *http.Request) {
 	//	return
 	//}
 	// content checking
-	if req.Header.Get("Content-Type") != "text/plain" {
-		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest) //400
-		return
-	}
+	//if req.Header.Get("Content-Type") != "text/plain" {
+	//	http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest) //400
+	//	return
+	//}
 	// body checking
 	body, err := io.ReadAll(req.Body)
 	if err != nil || len(body) == 0 {
@@ -45,10 +45,10 @@ func GetLongURLHandler(res http.ResponseWriter, req *http.Request) {
 	//	return
 	//}
 	// content checking
-	if req.Header.Get("Content-Type") != "text/plain" {
-		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
+	//if req.Header.Get("Content-Type") != "text/plain" {
+	//	http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+	//	return
+	//}
 	// id checking
 	//id := req.URL.Query().Get("id")
 	id := req.PathValue("id")

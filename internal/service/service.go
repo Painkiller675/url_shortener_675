@@ -11,7 +11,7 @@ var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func GetRandURL(n int, baseURL string) string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	b := make([]rune, n, n)
+	b := make([]rune, n)
 	for i := range b {
 		b[i] = letterRunes[r.Intn(len(letterRunes))]
 	}
