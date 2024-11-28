@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -32,7 +31,7 @@ func GetShortURL(alias string) (string, error) {
 			return al, nil
 		}
 	}
-	return "", errors.New(fmt.Sprintf("alias %s not exists", alias))
+	return "", fmt.Errorf("%v does not exist", alias)
 }
 
 //url, isExist := UrlStorage[alias]
