@@ -6,28 +6,28 @@ import (
 	"strings"
 )
 
-var UrlStorage = make(map[string]string) // ALIAS - URL
+var URLStorage = make(map[string]string) // ALIAS - URL
 
 func WriteURL(url string, alias string) {
 	isChanged := false
 	// check if such url already exists if exists => change that
-	for al, ur := range UrlStorage {
+	for al, ur := range URLStorage {
 		if ur == url {
-			delete(UrlStorage, al)
-			UrlStorage[alias] = url
+			delete(URLStorage, al)
+			URLStorage[alias] = url
 			isChanged = true
 			break
 		}
 	}
 	// if not exists => add
 	if !isChanged {
-		UrlStorage[alias] = url
+		URLStorage[alias] = url
 	}
-	fmt.Println("from write", UrlStorage)
+	fmt.Println("from write", URLStorage)
 }
 
 func GetShortURL(alias string) (string, error) {
-	for al := range UrlStorage {
+	for al := range URLStorage {
 		if strings.Contains(al, alias) {
 			return al, nil
 		}
