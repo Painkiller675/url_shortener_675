@@ -1,14 +1,14 @@
 package handlers
 
 import (
+	"github.com/Painkiller675/url_shortener_675/internal/repository"
 	"github.com/Painkiller675/url_shortener_675/internal/service"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 )
-
-var origURL string
 
 func CreateShortURLHandler(res http.ResponseWriter, req *http.Request) {
 	// content checking
@@ -22,18 +22,24 @@ func CreateShortURLHandler(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	defer req.Body.Close() // TODO here it might be completed by the lib? => mb del that
-	origURL = string(body)
+
 	// write aliass
 	// TODO mb GetRandURL should return error too?
-	randURL := service.GetRandURL(8, origURL)
-	//repository.WriteURL(string(body), randURL)
+	randAl := service.GetRandString(8)
+	repository.WriteURL(randAl, string(body))
 	// response molding
+	baseURL := "http://localhost:8080/"
+	resultURL, err := url.JoinPath(baseURL, randAl)
+	if err != nil {
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	res.Header().Set("Content-Type", "text/plain")
-	res.Header().Set("Content-Length", strconv.Itoa(len([]byte(randURL))))
+	res.Header().Set("Content-Length", strconv.Itoa(len([]byte(resultURL))))
 	// TODO add content length?
 	res.WriteHeader(http.StatusCreated) // 201
-	_, err = res.Write([]byte(randURL))
+	_, err = res.Write([]byte(resultURL))
 	if err != nil {
 		log.Printf("Error writing to response: %v", err)
 		return
@@ -46,22 +52,20 @@ func GetLongURLHandler(res http.ResponseWriter, req *http.Request) {
 	//	http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest) //400
 	//	return
 	//}
-	u := req.URL
-	_ = u
-	//id := req.PathValue("id") // the cap
+	id := req.PathValue("id") // the cap
 	//_ = id                    // the cap
 	//if id == "" {
 	//	http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	//	return
 	//}
 	// response molding
-	//url, err := repository.GetShortURL(id)
+	orURL, err := repository.GetShortURL(id)
 	//fmt.Println("REQUEST: ", id)
 	//fmt.Println("REQUEST: ", url)
-	//if err != nil { //TODO: mb change that to error 400>?
-	//	http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-	//	return
-	//}
-	res.Header().Set("Location", origURL)
+	if err != nil { //TODO: mb change that to error 400>?
+		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+	res.Header().Set("Location", orURL)
 	res.WriteHeader(http.StatusTemporaryRedirect) // 307
 }
