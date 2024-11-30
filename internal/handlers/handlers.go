@@ -58,7 +58,7 @@ func GetLongURLHandler(res http.ResponseWriter, req *http.Request) {
 	//	http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	//	return
 	//}
-	// response molding
+	// response molding ...
 	orURL, err := repository.GetShortURL(id)
 	//fmt.Println("REQUEST: ", id)
 	//fmt.Println("REQUEST: ", url)
