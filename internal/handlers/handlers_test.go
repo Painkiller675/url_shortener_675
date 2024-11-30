@@ -21,7 +21,7 @@ func TestCreateShortURLHandler(t *testing.T) {
 		want want
 	}{
 		{
-			name: "simple POST_test #1",
+			name: "simple POST_test #1 ",
 			want: want{
 				code: 201,
 			},
