@@ -22,6 +22,7 @@ func CreateShortURLHandler(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+	defer req.Body.Close() // TODO here it might be completed by the lib? => mb del that
 	origURL = string(body)
 	// write alias
 	// TODO mb GetRandURL should return error too?
@@ -45,8 +46,10 @@ func GetLongURLHandler(res http.ResponseWriter, req *http.Request) {
 	//	http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest) //400
 	//	return
 	//}
-	id := req.PathValue("id") // the cap
-	_ = id                    // the cap
+	u := req.URL
+	_ = u
+	//id := req.PathValue("id") // the cap
+	//_ = id                    // the cap
 	//if id == "" {
 	//	http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 	//	return
