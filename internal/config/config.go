@@ -35,4 +35,12 @@ func SetConfig() {
 	}
 
 	flag.Parse()
+
+	if envRunAddr := os.Getenv("SERVER_ADDRESS"); envRunAddr != "" {
+		StartOptions.HTTPServer.Address = envRunAddr
+	}
+	if envBaseURL := os.Getenv("BASE_URL"); envBaseURL != "" {
+		StartOptions.BaseURL = envBaseURL
+	}
+
 }
