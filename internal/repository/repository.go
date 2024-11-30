@@ -2,34 +2,20 @@ package repository
 
 import (
 	"fmt"
-	"strings"
 )
 
-var URLStorage = make(map[string]string) // ALIAS - URL
+// no uniqueness
+var URLStorage = make(map[string]string) // ALIAS - orURL
 
-func WriteURL(url string, alias string) {
-	isChanged := false
+func WriteURL(newAl string, newOrURL string) {
 	// check if such url already exists if exists => change that
-	for al, ur := range URLStorage {
-		if ur == url {
-			delete(URLStorage, al)
-			URLStorage[alias] = url
-			isChanged = true
-			break
-		}
-	}
-	// if not exists => add
-	if !isChanged {
-		URLStorage[alias] = url
-	}
+	URLStorage[newAl] = newOrURL
 	fmt.Println("from write", URLStorage)
 }
 
 func GetShortURL(alias string) (string, error) {
-	for al := range URLStorage {
-		if strings.Contains(al, alias) {
-			return al, nil
-		}
+	if curOrURL, ok := URLStorage[alias]; ok {
+		return curOrURL, nil
 	}
 	return "", fmt.Errorf("%v does not exist", alias)
 }
