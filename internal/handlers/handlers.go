@@ -24,7 +24,7 @@ func CreateShortURLHandler(res http.ResponseWriter, req *http.Request) {
 	}
 	defer req.Body.Close() // TODO here it might be completed by the lib? => mb del that
 	origURL = string(body)
-	// write alias
+	// write aliass
 	// TODO mb GetRandURL should return error too?
 	randURL := service.GetRandURL(8, origURL)
 	//repository.WriteURL(string(body), randURL)
