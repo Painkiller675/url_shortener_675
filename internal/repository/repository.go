@@ -6,8 +6,11 @@ import (
 )
 
 // JSONStruct is used to unmarshal js request nd send js response in CreateShortURLJSONHandler
-type JSONStruct struct {
+type JSONStructSh struct {
 	ShURL string `json:"result"`
+}
+type JSONStructOr struct {
+	OrURL string `json:"url"`
 }
 
 type safeStruct struct {

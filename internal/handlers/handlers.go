@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/Painkiller675/url_shortener_6750/internal/config"
 	"github.com/Painkiller675/url_shortener_6750/internal/middleware/logger"
 	"github.com/Painkiller675/url_shortener_6750/internal/repository"
@@ -57,13 +58,17 @@ func GetLongURLHandler(res http.ResponseWriter, req *http.Request) {
 }
 
 func CreateShortURLJSONHandler(res http.ResponseWriter, req *http.Request) {
+
+	//err := json.NewDecoder(resp.Body).Decode(&jsonData)
+	//fmt.Println("body = ", body)
 	//check content-type
-	if ok := strings.Contains(req.Header.Get("Content-Type"), "application/json"); ok != true {
+	if ok := strings.Contains(req.Header.Get("Content-Type"), "application/json"); !ok {
 		logger.Log.Info("[INFO]", zap.String("body", "no content type"), zap.String("method", req.Method), zap.String("url", req.URL.Path))
 		http.Error(res, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	var jsStruct repository.JSONStruct
+	var jsStruct repository.JSONStructSh
+	var orStruct repository.JSONStructOr
 	var buf bytes.Buffer
 	// feed data from the body into the buffer
 	if _, err := buf.ReadFrom(req.Body); err != nil {
@@ -72,16 +77,20 @@ func CreateShortURLJSONHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 	// deserialize JSON into JSStruct
-	if err := json.Unmarshal(buf.Bytes(), &jsStruct); err != nil {
+	if err := json.Unmarshal(buf.Bytes(), &orStruct); err != nil {
 		logger.Log.Info("[ERROR]", zap.Error(err))
 		http.Error(res, err.Error(), http.StatusBadRequest)
 		return
 	}
+	fmt.Println("orStruct.OrURL = ", orStruct.OrURL)
 	// calculate the alias
 	randAl := service.GetRandString(8)
+	// write into safeStorage to allow getting the data
+	repository.WriteURL(randAl, orStruct.OrURL)
 	// base URL
 	baseURL := config.StartOptions.BaseURL
 	shURL, err := url.JoinPath(baseURL, randAl)
+
 	if err != nil {
 		logger.Log.Info("[ERROR]", zap.Error(err))
 		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
