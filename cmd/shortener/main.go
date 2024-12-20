@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Painkiller675/url_shortener_6750/internal/config"
 	"github.com/Painkiller675/url_shortener_6750/internal/handlers"
+	gzipMW "github.com/Painkiller675/url_shortener_6750/internal/middleware/gzip"
 	"github.com/Painkiller675/url_shortener_6750/internal/middleware/logger"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -21,6 +22,7 @@ func main() {
 
 	// set logger for chi router
 	r.Use(logger.LogMW)
+	r.Use(gzipMW.GzipMW)
 
 	// routing
 	r.Route("/", func(r chi.Router) {
