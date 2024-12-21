@@ -79,7 +79,7 @@ func GzipMW(h http.Handler) http.Handler {
 			logger.Log.Info("[INFO]", zap.String("[INFO]", "gzip IS NOT supported by the client!"), zap.String("method", req.Method), zap.String("url", req.URL.Path))
 			//  continue without gzip
 			h.ServeHTTP(res, req)
-			//return // TODO should I use "return" here or not?
+			return // TODO should I use "return" here or not?
 		}
 		// по умолчанию устанавливаем оригинальный http.ResponseWriter как тот,
 		// который будем передавать следующей функции
@@ -98,7 +98,7 @@ func GzipMW(h http.Handler) http.Handler {
 		}
 
 		// проверяем, что клиент отправил серверу сжатые данные в формате gzip
-		contentEncoding := req.Header.Get("Content-Encoding")
+		/*contentEncoding := req.Header.Get("Content-Encoding")
 		sendsGzip := strings.Contains(contentEncoding, "gzip")
 		if sendsGzip {
 			// оборачиваем тело запроса в io.Reader с поддержкой декомпрессии
@@ -110,7 +110,7 @@ func GzipMW(h http.Handler) http.Handler {
 			// меняем тело запроса на новое
 			req.Body = cr
 			defer cr.Close()
-		}
+		}*/
 
 		// передаём управление хендлеру
 		h.ServeHTTP(ow, req)
