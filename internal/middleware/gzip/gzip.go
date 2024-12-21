@@ -79,7 +79,7 @@ func GzipMW(h http.Handler) http.Handler {
 			logger.Log.Info("[INFO]", zap.String("[INFO]", "gzip IS NOT supported by the client!"), zap.String("method", req.Method), zap.String("url", req.URL.Path))
 			//  continue without gzip
 			h.ServeHTTP(res, req)
-			return // TODO should I use "return" here or not?
+			//return // TODO should I use "return" here or not?
 		}
 		// по умолчанию устанавливаем оригинальный http.ResponseWriter как тот,
 		// который будем передавать следующей функции
