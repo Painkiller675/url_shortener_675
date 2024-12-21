@@ -29,7 +29,9 @@ func CreateShortURLHandler(res http.ResponseWriter, req *http.Request) {
 	repository.WriteURL(randAl, string(body))
 	// response molding
 	baseURL := config.StartOptions.BaseURL
+	fmt.Println("BASE URL in CreateNoJS = ", baseURL)
 	resultURL, err := url.JoinPath(baseURL, randAl)
+	fmt.Println("resultURL in CreateNOJS = ", resultURL)
 	if err != nil {
 		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -108,9 +110,10 @@ func CreateShortURLJSONHandler(res http.ResponseWriter, req *http.Request) {
 	// headers molding ..
 	res.Header().Set("Content-Type", "application"+
 		"/json")
-	res.Header().Set("Content-Length", strconv.Itoa(len(marData)))
+	//res.Header().Set("Content-Length", strconv.Itoa(len(marData)))
 	res.WriteHeader(http.StatusCreated) // 201
 	// response body molding
+	fmt.Println("MarData = ", marData)
 	_, err = res.Write(marData)
 	if err != nil {
 		logger.Log.Info("[ERROR]", zap.Error(err))
