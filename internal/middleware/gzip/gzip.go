@@ -75,30 +75,10 @@ func (c *compressReader) Close() error {
 
 func GzipMW(h http.Handler) http.Handler {
 	gzipFunc := func(res http.ResponseWriter, req *http.Request) {
-		if !((strings.Contains(req.Header.Get("Content-Type"), "application/json") || strings.Contains(req.Header.Get("Content-Type"), "text/html")) && (strings.Contains(req.Header.Get("Accept-Encoding"), "gzip"))) {
-			logger.Log.Info("[INFO]", zap.String("[INFO]", "gzip IS NOT supported by the client!"), zap.String("method", req.Method), zap.String("url", req.URL.Path))
-			//  continue without gzip
-			h.ServeHTTP(res, req)
-			return // TODO should I use "return" here or not?
-		}
-		// по умолчанию устанавливаем оригинальный http.ResponseWriter как тот,
-		// который будем передавать следующей функции
-		ow := res
-
-		// проверяем, что клиент умеет получать от сервера сжатые данные в формате gzip
-		acceptEncoding := req.Header.Get("Accept-Encoding")
-		supportsGzip := strings.Contains(acceptEncoding, "gzip")
-		if supportsGzip {
-			// оборачиваем оригинальный http.ResponseWriter новым с поддержкой сжатия
-			cw := newCompressWriter(res)
-			// меняем оригинальный http.ResponseWriter на новый
-			ow = cw
-			// не забываем отправить клиенту все сжатые данные после завершения middleware
-			defer cw.Close()
-		}
-
 		// проверяем, что клиент отправил серверу сжатые данные в формате gzip
-		/*contentEncoding := req.Header.Get("Content-Encoding")
+		// TODO go up - serveHTTP
+		or := req
+		contentEncoding := req.Header.Get("Content-Encoding")
 		sendsGzip := strings.Contains(contentEncoding, "gzip")
 		if sendsGzip {
 			// оборачиваем тело запроса в io.Reader с поддержкой декомпрессии
@@ -110,10 +90,37 @@ func GzipMW(h http.Handler) http.Handler {
 			// меняем тело запроса на новое
 			req.Body = cr
 			defer cr.Close()
-		}*/
+		}
+		//h.ServeHTTP(res, req)
 
-		// передаём управление хендлеру
-		h.ServeHTTP(ow, req)
+		// проверяем, что клиент умеет получать от сервера сжатые данные в формате gzip
+		acceptEncoding := req.Header.Get("Accept-Encoding") // это выставляет клиенот
+		supportsGzip := strings.Contains(acceptEncoding, "gzip")
+		if !supportsGzip {
+			return
+		} // заретёрнить
+
+		// TODO проверить умеет ли клинент получать NO - RETURN
+		// выставил ли хэндлер это всё? Мой хендлерю Если длина ответа меньше 200 байт => не гзипуем ТУТ ПРОВЕРЯМ RES?
+		if !(strings.Contains(req.Header.Get("Content-Type"), "application/json") || strings.Contains(req.Header.Get("Content-Type"), "text/html")) {
+			logger.Log.Info("[INFO]", zap.String("[INFO]", "gzip IS NOT supported by the client!"), zap.String("method", req.Method), zap.String("url", req.URL.Path))
+			//  continue without gzip
+			h.ServeHTTP(res, or)
+			return
+		}
+		// по умолчанию устанавливаем оригинальный http.ResponseWriter как тот,
+		// который будем передавать следующей функции
+		//ow := res МОЖЕТ И НЕ НАДО ЭТО
+		// TODO move here
+		// оборачиваем оригинальный http.ResponseWriter новым с поддержкой сжатия
+		cw := newCompressWriter(res)
+		// меняем оригинальный http.ResponseWriter на новый
+		//ow = cw
+		// не забываем отправить клиенту все сжатые данные после завершения middleware
+		defer cw.Close()
+
+		h.ServeHTTP(cw, req)
+
 	}
 	return http.HandlerFunc(gzipFunc)
 }

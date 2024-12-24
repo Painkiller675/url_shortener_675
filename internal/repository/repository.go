@@ -13,10 +13,13 @@ type JSONStructOr struct {
 	OrURL string `json:"url"`
 }
 
+// TODO constructor safeStruct
 type safeStruct struct {
 	AlURLStorage map[string]string `json:"al_url_storage"`
-	mx           sync.RWMutex
+	mx           sync.RWMutex      `json:"-"`
 }
+
+// to send it to handler i should use func кот прин об или струтуру (applic1		 handler ..)
 
 func (s *safeStruct) StoreAlURL(alias string, orURL string) {
 	s.mx.Lock()
@@ -39,6 +42,7 @@ func newSafeStruct() *safeStruct {
 	return &s
 }
 
+// TODO public constructor return SafeStruct and in struct that it returns thre will be get nd write
 var orAlURLStorage = newSafeStruct() // ALIAS - orURL
 
 func WriteURL(newAl string, newOrURL string) {
@@ -55,3 +59,48 @@ func GetShortURL(alias string) (string, error) {
 
 	return curAl, nil
 }
+
+/*
+// Open / close file
+type Consumer struct {
+	file *os.File
+	// заменяем Reader на Scanner
+	scanner *bufio.Scanner
+}
+
+// NewConsumer to open file
+func NewConsumer(filename string) (*Consumer, error) {
+	file, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Consumer{
+		file: file,
+		// создаём новый scanner
+		scanner: bufio.NewScanner(file),
+	}, nil
+}
+
+// Read to read from file
+func (c *Consumer) ReadEvent() (*Event, error) {
+	// одиночное сканирование до следующей строки
+	if !c.scanner.Scan() {
+		return nil, c.scanner.Err()
+	}
+	// читаем данные из scanner
+	data := c.scanner.Bytes()
+
+	event := Event{}
+	err := json.Unmarshal(data, &event)
+	if err != nil {
+		return nil, err
+	}
+
+	return &event, nil
+}
+
+func (c *Consumer) Close() error {
+	return c.file.Close()
+}
+*/
