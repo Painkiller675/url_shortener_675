@@ -73,11 +73,11 @@ func (c *compressReader) Close() error {
 	return c.zr.Close()
 }
 
-func GzipMW(h http.Handler) http.Handler {
+func GzMW(h http.Handler) http.Handler {
 	gzipFunc := func(res http.ResponseWriter, req *http.Request) {
-		// проверяем, что клиент отправил серверу сжатые данные в формате gzip
-		// TODO go up - serveHTTP
+		// copy original request
 		or := req
+		// check, that the client sent to the server compressed data in gzip format
 		contentEncoding := req.Header.Get("Content-Encoding")
 		sendsGzip := strings.Contains(contentEncoding, "gzip")
 		if sendsGzip {
@@ -85,6 +85,7 @@ func GzipMW(h http.Handler) http.Handler {
 			cr, err := newCompressReader(req.Body)
 			if err != nil {
 				res.WriteHeader(http.StatusInternalServerError)
+				// TODO mb I should call handler with original res and req here?
 				return
 			}
 			// меняем тело запроса на новое
@@ -94,32 +95,26 @@ func GzipMW(h http.Handler) http.Handler {
 		//h.ServeHTTP(res, req)
 
 		// проверяем, что клиент умеет получать от сервера сжатые данные в формате gzip
-		acceptEncoding := req.Header.Get("Accept-Encoding") // это выставляет клиенот
+		acceptEncoding := req.Header.Get("Accept-Encoding") // это выставляет клиент
 		supportsGzip := strings.Contains(acceptEncoding, "gzip")
 		if !supportsGzip {
+			// continue without gzip
+			h.ServeHTTP(res, or)
 			return
-		} // заретёрнить
-
-		// TODO проверить умеет ли клинент получать NO - RETURN
-		// выставил ли хэндлер это всё? Мой хендлерю Если длина ответа меньше 200 байт => не гзипуем ТУТ ПРОВЕРЯМ RES?
+		}
+		// TODO проверяю тут req, хотя Вы говорили про res, всё ли ОК??
 		if !(strings.Contains(req.Header.Get("Content-Type"), "application/json") || strings.Contains(req.Header.Get("Content-Type"), "text/html")) {
 			logger.Log.Info("[INFO]", zap.String("[INFO]", "gzip IS NOT supported by the client!"), zap.String("method", req.Method), zap.String("url", req.URL.Path))
 			//  continue without gzip
 			h.ServeHTTP(res, or)
 			return
 		}
-		// по умолчанию устанавливаем оригинальный http.ResponseWriter как тот,
-		// который будем передавать следующей функции
-		//ow := res МОЖЕТ И НЕ НАДО ЭТО
-		// TODO move here
 		// оборачиваем оригинальный http.ResponseWriter новым с поддержкой сжатия
-		cw := newCompressWriter(res)
-		// меняем оригинальный http.ResponseWriter на новый
-		//ow = cw
+		cres := newCompressWriter(res)
 		// не забываем отправить клиенту все сжатые данные после завершения middleware
-		defer cw.Close()
-
-		h.ServeHTTP(cw, req)
+		defer cres.Close()
+		// call handler with modified res and req
+		h.ServeHTTP(cres, req)
 
 	}
 	return http.HandlerFunc(gzipFunc)

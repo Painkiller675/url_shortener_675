@@ -22,7 +22,7 @@ func main() {
 
 	// set logger for chi router
 	r.Use(logger.LogMW)
-	r.Use(gzipMW.GzipMW)
+	r.Use(gzipMW.GzMW)
 
 	// routing
 	r.Route("/", func(r chi.Router) {
