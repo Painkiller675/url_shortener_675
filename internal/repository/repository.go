@@ -44,7 +44,6 @@ func newSafeStorage(logger *zap.Logger) *safeStorage {
 	stor, err := getStorage(config.StartOptions.Filename)
 	if err != nil {
 		panic(err) // TODO HANDLE THAT! add err in signature??
-		return nil
 
 	}
 	return &safeStorage{
