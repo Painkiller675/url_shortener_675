@@ -27,7 +27,7 @@ func NewZapLogger(level string) (*ZapLogger, error) {
 	if err != nil {
 		return nil, err
 	}
-	var newNop *zap.Logger = zap.NewNop() // TODO is it needed?
+	var newNop = zap.NewNop() // TODO is it needed?
 	newNop = zl
 	return &ZapLogger{
 		Logger: newNop,
