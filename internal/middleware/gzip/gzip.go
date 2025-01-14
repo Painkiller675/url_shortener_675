@@ -93,6 +93,7 @@ func GzMW(h http.Handler) http.Handler {
 			fmt.Println("[INFO] req.Body = ", req.Body)
 			cr, err := newCompressReader(req.Body)
 			if err != nil {
+				fmt.Println(err)
 				fmt.Println("[ERROR] 500")
 				res.WriteHeader(http.StatusInternalServerError)
 				// TODO mb I should call handler with original res and req here?
