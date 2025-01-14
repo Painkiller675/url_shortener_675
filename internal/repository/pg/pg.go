@@ -57,7 +57,7 @@ func (s *Storage) StoreAlURL(ctx context.Context, alias string, url string) (int
 	const op = "postgreSQL.StoreAlURL"
 	stmt, err := s.conn.Prepare("INSERT INTO url (alias, url) VALUES ($1,$2);")
 	if err != nil {
-		fmt.Errorf("%s: %w", op, err)
+		err = fmt.Errorf("%s: %w", op, err)
 		return 0, err
 	}
 

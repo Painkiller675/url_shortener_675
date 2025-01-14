@@ -14,7 +14,7 @@ import (
 )
 
 type Storage struct {
-	alURLStorage map[string]string `json:"al_url_storage"`
+	alURLStorage map[string]string `json:"-"`
 	Filename     string            `json:"-"`
 	mx           *sync.RWMutex     `json:"-"` // TODO pointer or not??
 	Logger       *zap.Logger       `json:"-"`
