@@ -47,7 +47,7 @@ func main() {
 	// routing
 	r.Route("/", func(r chi.Router) {
 		r.Post("/", c.CreateShortURLHandler(ctx))
-		r.Get("/ping", c.PingDB)
+		r.Get("/ping", c.PingDB(ctx))
 		r.Get("/{id}", c.GetLongURLHandler(ctx))
 		r.Post("/api/shorten", c.CreateShortURLJSONHandler(ctx))
 		//r.Post("/api/shorten/batch", c.CreateShortURLJSONBatchHandler)

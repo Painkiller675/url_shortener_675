@@ -99,7 +99,6 @@ func (s *Storage) GetOrURLByAl(ctx context.Context, alias string) (string, error
 }
 
 func (s *Storage) Ping(ctx context.Context) error {
-
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	if err := s.conn.PingContext(ctx); err != nil {

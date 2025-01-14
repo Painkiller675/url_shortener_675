@@ -166,18 +166,20 @@ func (c *Controller) CreateShortURLJSONHandler(ctx context.Context) http.Handler
 	}
 }
 
-func (c *Controller) PingDB(res http.ResponseWriter, _ *http.Request) {
-	ctx := context.Background()
-	err := c.storage.Ping(ctx)
-	// if no connection
-	if err != nil {
-		c.logger.Info("[ERROR]", zap.String("PingDB", "Can't ping pg database!"), zap.Error(err))
-		http.Error(res, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	// if connected
-	res.WriteHeader(http.StatusOK)
+func (c *Controller) PingDB(ctx context.Context) http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
+		//ctx := context.Background()
+		err := c.storage.Ping(ctx)
+		// if no connection
+		if err != nil {
+			c.logger.Info("[ERROR]", zap.String("PingDB", "Can't ping pg database!"), zap.Error(err))
+			http.Error(res, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// if connected
+		res.WriteHeader(http.StatusOK)
 
+	}
 }
 
 /*
