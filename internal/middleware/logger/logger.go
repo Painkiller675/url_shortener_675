@@ -40,9 +40,9 @@ func NewZapLogger(level string) (*ZapLogger, error) {
 /*func NewZapLogger(level zapcore.Level) (*ZapLogger, error) {
 	atomic := zap.NewAtomicLevelAt(level)
 	settings := defaultSettings(atomic)
-	l, err := settings.config.Build(settings.opts...)
-	if err != nil {
-		return nil, err
+	l, merrors := settings.config.Build(settings.opts...)
+	if merrors != nil {
+		return nil, merrors
 	}
 
 	return &ZapLogger{
@@ -120,18 +120,18 @@ func (l *ZapLogger) LogMW(next http.Handler) http.Handler {
 /*
 func Initialize(level string) error {
 	// transform text logging lvl in zap.AtomicLevel
-	lvl, err := zap.ParseAtomicLevel(level)
-	if err != nil {
-		return err
+	lvl, merrors := zap.ParseAtomicLevel(level)
+	if merrors != nil {
+		return merrors
 	}
 	// create new log configuration
 	cfg := zap.NewProductionConfig()
 	// set lvl
 	cfg.Level = lvl
 	// create logger on the basis of config
-	zl, err := cfg.Build()
-	if err != nil {
-		return err
+	zl, merrors := cfg.Build()
+	if merrors != nil {
+		return merrors
 	}
 	// set singleton
 	Log = zl

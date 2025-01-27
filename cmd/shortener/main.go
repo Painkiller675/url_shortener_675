@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/Painkiller675/url_shortener_6750/internal/config"
 	"github.com/Painkiller675/url_shortener_6750/internal/controller"
 	gzipMW "github.com/Painkiller675/url_shortener_6750/internal/middleware/gzip"
@@ -24,8 +25,14 @@ func main() {
 	//render logger for gzip
 	//gzipMW.NewGzipLogger(l.Logger)
 
+	//init the context
+	ctx := context.Background()
+
 	// init storage
-	s := repository.NewStorage(l.Logger)
+	s, err := repository.ChooseStorage(ctx, l.Logger)
+	if err != nil {
+		panic(err) // TODO: [MENTOR] is it good to panic here or I could handle it miles better?
+	}
 
 	// init controller
 	c := controller.New(l.Logger, s)
@@ -39,9 +46,13 @@ func main() {
 
 	// routing
 	r.Route("/", func(r chi.Router) {
-		r.Post("/", c.CreateShortURLHandler)
-		r.Get("/{id}", c.GetLongURLHandler)
-		r.Post("/api/shorten", c.CreateShortURLJSONHandler)
+		r.Post("/", c.CreateShortURLHandler())
+		r.Get("/ping", c.PingDB())
+		r.Get("/{id}", c.GetLongURLHandler())
+		r.Post("/api/shorten", c.CreateShortURLJSONHandler())
+		r.Post("/api/shorten/batch", c.CreateShortURLJSONBatchHandler())
+		r.Get("/api/user/urls", c.GetUserURLSHandler())
+
 	})
 	//start server
 	l.Logger.Info("Running server", zap.String("address", config.StartOptions.HTTPServer.Address))
