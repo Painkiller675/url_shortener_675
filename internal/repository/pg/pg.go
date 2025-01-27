@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/Painkiller675/url_shortener_6750/internal/lib/merrors"
 	"github.com/Painkiller675/url_shortener_6750/internal/models"
+	"github.com/Painkiller675/url_shortener_6750/internal/service"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -205,7 +206,7 @@ func (s *Storage) SaveBatchURL(ctx context.Context, corURLSh *[]models.JSONBatSt
 	// fill transaction with insert queries:
 
 	for _, idURLSh := range *corURLSh {
-		_, err := s.StoreAlURL(ctx, idURLSh.ShortURL, idURLSh.OriginalURL, "") //TODO: correct that?
+		_, err := s.StoreAlURL(ctx, idURLSh.ShortURL, idURLSh.OriginalURL, service.GetRandString(time.Now().String())) //TODO: correct that?
 		// TODO: if exists => get it from DB for response
 		if err != nil {
 			if errors.Is(err, merrors.ErrURLOrAliasExists) {
