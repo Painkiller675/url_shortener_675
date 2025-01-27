@@ -41,26 +41,26 @@ func New(logger *zap.Logger, storage repository.URLStorage) *Controller {
 func (c *Controller) genJWTTokenString() (string, string, error) { // TODO [MENTOR]: mb I should replace this func ???
 	// создаём новый токен с алгоритмом подписи HS256 и утверждениями — Claims
 	//usId := string(time.Now().Unix())
-	usId := service.GetRandString(time.Now().UTC().String())
+	usID := service.GetRandString(time.Now().UTC().String())
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, models.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			// set expiration time
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(config.TOKEN_EXP)), //TODO [MENTOR] is it a good way to store it?
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(config.TokenExp)), //TODO [MENTOR] is it a good way to store it?
 		},
 		// set my own statement
-		UserID: usId, // TODO [MENTOR]: how should I implement it better??
+		UserID: usID, // TODO [MENTOR]: how should I implement it better??
 		// int(b[0] + b[1])
 	})
 
 	// создаём строку токена
-	tokenString, err := token.SignedString([]byte(config.SECRET_KEY)) // TODO [MENTOR]: how to store it better? how people store it in real projects? In env?
-	// TODO: ok if env .. I set the env value SECRET_KEY on my PC e.g. and then start the app?
+	tokenString, err := token.SignedString([]byte(config.SecretKey)) // TODO [MENTOR]: how to store it better? how people store it in real projects? In env?
+	// TODO: ok if env .. I set the env value secretKey on my PC e.g. and then start the app?
 	if err != nil {
 		return "", "", err
 	}
 
 	// возвращаем строку токена
-	return tokenString, usId, nil
+	return tokenString, usID, nil
 
 }
 
@@ -84,7 +84,7 @@ func (c *Controller) retrieveUserIDFromTokenString(r *http.Request) string { // 
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		} // anti-hacker check
-		return []byte(config.SECRET_KEY), nil
+		return []byte(config.SecretKey), nil
 	})
 	if err != nil {
 		c.logger.Info("Can't parse token!", zap.Error(err))
@@ -107,7 +107,7 @@ func (с *Controller) setAuthToken(w http.ResponseWriter, tokenStr string) {
 	http.SetCookie(w, &http.Cookie{
 		Name:    "token",
 		Value:   tokenStr,
-		Expires: time.Now().Add(config.TOKEN_EXP),
+		Expires: time.Now().Add(config.TokenExp),
 	})
 
 }
@@ -418,14 +418,14 @@ func (c *Controller) GetUserURLSHandler() http.HandlerFunc {
 			return
 		}
 		// replace alias with short url (add base url)
-		for _, alURL := range *respAlURLStruct {
+		for n, alURL := range *respAlURLStruct {
 			fullShortURL, err := url.JoinPath(config.StartOptions.BaseURL, alURL.ShortURL)
 			if err != nil {
 				c.logger.Error("[ERROR]", zap.Error(err))
 				http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
-			alURL.ShortURL = fullShortURL
+			(*(respAlURLStruct))[n].ShortURL = fullShortURL
 
 		}
 

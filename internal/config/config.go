@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-const TOKEN_EXP = time.Hour * 3
-const SECRET_KEY = "supersecretkey"
+const TokenExp = time.Hour * 3
+const SecretKey = "supersecretkey"
 
 var version = "4.0" +
 	""

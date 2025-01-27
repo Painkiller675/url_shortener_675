@@ -141,6 +141,11 @@ func (s *Storage) GetDataByUserID(ctx context.Context, userID string) (*[]models
 			s.logger.Error("failed to close rows", zap.String("place", op), zap.Error(err))
 		}
 	}()
+	defer func() {
+		if err := rows.Err(); err != nil {
+			s.logger.Error("rows.Err() issue", zap.String("place", op), zap.Error(err))
+		}
+	}()
 	var userData []models.UserURLS
 
 	for rows.Next() {
