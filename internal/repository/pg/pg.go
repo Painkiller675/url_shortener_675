@@ -64,7 +64,7 @@ func NewStorage(ctx context.Context, conStr string) (*Storage, error) { // TODO:
 	return &Storage{conn: conn}, nil
 }
 
-func (s *Storage) StoreAlURL(ctx context.Context, alias string, url string, userId string) (int64, error) {
+func (s *Storage) StoreAlURL(ctx context.Context, alias string, url string, userID string) (int64, error) {
 	const op = "pg.StoreAlURL"
 	stmt, err := s.conn.Prepare("INSERT INTO url (alias, url, userId) VALUES ($1,$2, $3);")
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *Storage) StoreAlURL(ctx context.Context, alias string, url string, user
 		return 0, err
 	}
 	fmt.Println("1. alias = ", alias)
-	_, err = stmt.ExecContext(ctx, alias, url, userId) // _ = res (to ge LastId)
+	_, err = stmt.ExecContext(ctx, alias, url, userID) // _ = res (to ge LastId)
 	if err != nil {
 		fmt.Printf("%s: %s\n", op, err)
 		// TODO: what does it actually mean???
@@ -125,9 +125,9 @@ func (s *Storage) GetOrURLByAl(ctx context.Context, alias string) (string, error
 
 }
 
-func (s *Storage) GetDataByUserId(ctx context.Context, userId string) (*[]models.UserURLS, error) {
+func (s *Storage) GetDataByUserId(ctx context.Context, userID string) (*[]models.UserURLS, error) {
 	const op = "pg.GetDataByUserId"
-	rows, err := s.conn.QueryContext(ctx, "SELECT alias, url FROM url WHERE userId=$1;", userId)
+	rows, err := s.conn.QueryContext(ctx, "SELECT alias, url FROM url WHERE userId=$1;", userID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) { // no rows for  a specific user
 			return nil, merrors.ErrURLNotFound

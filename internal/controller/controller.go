@@ -40,7 +40,8 @@ func New(logger *zap.Logger, storage repository.URLStorage) *Controller {
 // genJWTTokenString create JWT token and return it in string type
 func (c *Controller) genJWTTokenString() (string, string, error) { // TODO [MENTOR]: mb I should replace this func ???
 	// создаём новый токен с алгоритмом подписи HS256 и утверждениями — Claims
-	usId := string(time.Now().Unix())
+	//usId := string(time.Now().Unix())
+	usId := service.GetRandString(time.Now().UTC().String())
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, models.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			// set expiration time
@@ -63,7 +64,7 @@ func (c *Controller) genJWTTokenString() (string, string, error) { // TODO [MENT
 
 }
 
-func (c *Controller) retrieveUserIdFromTokenString(r *http.Request) string { // TODO [MENTOR]: mb I should replace this func ???
+func (c *Controller) retrieveUserIDFromTokenString(r *http.Request) string { // TODO [MENTOR]: mb I should replace this func ???
 	// get token string from the cookies
 	tokenString, err := r.Cookie("token")
 
@@ -128,12 +129,12 @@ func (c *Controller) CreateShortURLHandler() http.HandlerFunc {
 			return
 		}
 
-		var tokenStr, userId string
+		var tokenStr, userID string
 
 		// retrieve token if any
-		userId = c.retrieveUserIdFromTokenString(req)
-		if userId == "-1" { // can't retrieve => register a new user a
-			tokenStr, userId, err = c.genJWTTokenString()
+		userID = c.retrieveUserIDFromTokenString(req)
+		if userID == "-1" { // can't retrieve => register a new user a
+			tokenStr, userID, err = c.genJWTTokenString()
 			if err != nil {
 				c.logger.Info("Can't generate token!", zap.Error(err))
 				res.WriteHeader(http.StatusInternalServerError)
@@ -144,7 +145,7 @@ func (c *Controller) CreateShortURLHandler() http.HandlerFunc {
 		c.setAuthToken(res, tokenStr)
 		// save the data
 		randAl := service.GetRandString(string(body))
-		_, err = c.storage.StoreAlURL(req.Context(), randAl, string(body), userId) // TODO [MENTOR]: mb del _ or change driver to support id?
+		_, err = c.storage.StoreAlURL(req.Context(), randAl, string(body), userID) // TODO [MENTOR]: mb del _ or change driver to support id?
 		httpStatus := http.StatusCreated
 		if err != nil {
 			if errors.Is(err, merrors.ErrURLOrAliasExists) { // the try to short already existed url pg database
@@ -221,7 +222,7 @@ func (c *Controller) CreateShortURLJSONHandler() http.HandlerFunc {
 		var tokenStr, userId string
 		var err error
 		// retrieve token if any
-		userId = c.retrieveUserIdFromTokenString(req)
+		userId = c.retrieveUserIDFromTokenString(req)
 		if userId == "-1" { // can't retrieve => register a new user a
 			tokenStr, userId, err = c.genJWTTokenString()
 			if err != nil {
@@ -398,13 +399,13 @@ func (c *Controller) GetUserURLSHandler() http.HandlerFunc {
 		const op = "controller.GetUserURLSHandler"
 
 		// retrieve token if any
-		userId := c.retrieveUserIdFromTokenString(req)
-		if userId == "-1" { // can't retrieve => return 401 Unauthorized
+		userID := c.retrieveUserIDFromTokenString(req)
+		if userID == "-1" { // can't retrieve => return 401 Unauthorized
 			res.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		//var alURLStruct = models.UserURLS{}
-		respAlURLStruct, err := c.storage.GetDataByUserId(req.Context(), userId)
+		respAlURLStruct, err := c.storage.GetDataByUserId(req.Context(), userID)
 		if err != nil {
 			if errors.Is(err, merrors.ErrURLNotFound) { // no data for the user!
 				c.logger.Info("[INFO]", zap.String("place:", op), zap.Error(err))

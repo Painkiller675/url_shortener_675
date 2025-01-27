@@ -18,7 +18,7 @@ type URLStorage interface {
 	Ping(ctx context.Context) error
 	SaveBatchURL(ctx context.Context, corURLSh *[]models.JSONBatStructIDOrSh) (*[]models.JSONBatStructToSerResp, error)
 	GetAlByURL(ctx context.Context, url string) (string, error)
-	GetDataByUserId(ctx context.Context, userId string) (*[]models.UserURLS, error)
+	GetDataByUserId(ctx context.Context, userID string) (*[]models.UserURLS, error)
 }
 
 func ChooseStorage(ctx context.Context, logger *zap.Logger) (URLStorage, error) {
