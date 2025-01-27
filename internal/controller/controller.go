@@ -219,12 +219,12 @@ func (c *Controller) CreateShortURLJSONHandler() http.HandlerFunc {
 			return
 		}
 
-		var tokenStr, userId string
+		var tokenStr, userID string
 		var err error
 		// retrieve token if any
-		userId = c.retrieveUserIDFromTokenString(req)
-		if userId == "-1" { // can't retrieve => register a new user a
-			tokenStr, userId, err = c.genJWTTokenString()
+		userID = c.retrieveUserIDFromTokenString(req)
+		if userID == "-1" { // can't retrieve => register a new user a
+			tokenStr, userID, err = c.genJWTTokenString()
 			if err != nil {
 				c.logger.Info("Can't generate token!", zap.Error(err))
 				res.WriteHeader(http.StatusInternalServerError)
@@ -237,7 +237,7 @@ func (c *Controller) CreateShortURLJSONHandler() http.HandlerFunc {
 		// calculate the alias
 		randAl := service.GetRandString(orStruct.OrURL)
 		// save the data
-		_, err = c.storage.StoreAlURL(req.Context(), randAl, orStruct.OrURL, userId)
+		_, err = c.storage.StoreAlURL(req.Context(), randAl, orStruct.OrURL, userID)
 		httpStatus := http.StatusCreated
 		if err != nil {
 			if errors.Is(err, merrors.ErrURLOrAliasExists) { // if alias for url already exists in the pg database
@@ -405,7 +405,7 @@ func (c *Controller) GetUserURLSHandler() http.HandlerFunc {
 			return
 		}
 		//var alURLStruct = models.UserURLS{}
-		respAlURLStruct, err := c.storage.GetDataByUserId(req.Context(), userID)
+		respAlURLStruct, err := c.storage.GetDataByUserID(req.Context(), userID)
 		if err != nil {
 			if errors.Is(err, merrors.ErrURLNotFound) { // no data for the user!
 				c.logger.Info("[INFO]", zap.String("place:", op), zap.Error(err))

@@ -126,8 +126,8 @@ func (s *Storage) GetOrURLByAl(ctx context.Context, alias string) (string, error
 
 }
 
-func (s *Storage) GetDataByUserId(ctx context.Context, userID string) (*[]models.UserURLS, error) {
-	const op = "pg.GetDataByUserId"
+func (s *Storage) GetDataByUserID(ctx context.Context, userID string) (*[]models.UserURLS, error) {
+	const op = "pg.GetDataByUserID"
 	rows, err := s.conn.QueryContext(ctx, "SELECT alias, url FROM url WHERE userId=$1;", userID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) { // no rows for  a specific user
@@ -145,7 +145,7 @@ func (s *Storage) GetDataByUserId(ctx context.Context, userID string) (*[]models
 
 	for rows.Next() {
 		var usrData models.UserURLS
-		if err := rows.Scan(&usrData.ShortURL, &usrData.ShortURL); err != nil {
+		if err := rows.Scan(&usrData.ShortURL, &usrData.OriginalURL); err != nil {
 			return nil, fmt.Errorf("can's scan the row [%s]: %w", op, err)
 		}
 		userData = append(userData, usrData)

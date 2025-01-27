@@ -13,12 +13,12 @@ import (
 
 type URLStorage interface {
 	//StoreAlURL(ctx context.Context, alias string, url string) error
-	StoreAlURL(ctx context.Context, alias string, url string, userId string) (int64, error)
+	StoreAlURL(ctx context.Context, alias string, url string, userID string) (int64, error)
 	GetOrURLByAl(ctx context.Context, alias string) (string, error)
 	Ping(ctx context.Context) error
 	SaveBatchURL(ctx context.Context, corURLSh *[]models.JSONBatStructIDOrSh) (*[]models.JSONBatStructToSerResp, error)
 	GetAlByURL(ctx context.Context, url string) (string, error)
-	GetDataByUserId(ctx context.Context, userID string) (*[]models.UserURLS, error)
+	GetDataByUserID(ctx context.Context, userID string) (*[]models.UserURLS, error)
 }
 
 func ChooseStorage(ctx context.Context, logger *zap.Logger) (URLStorage, error) {

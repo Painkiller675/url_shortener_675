@@ -40,9 +40,8 @@ func NewStorage(logger *zap.Logger) *Storage {
 	}
 }
 
-func (s *Storage) StoreAlURL(_ context.Context, alias string, url string, userId string) (int64, error) {
+func (s *Storage) StoreAlURL(_ context.Context, alias string, url string, _ string) (int64, error) {
 	s.mx.Lock()
-	userId = userId // TODO: correct that blind plug
 	defer s.mx.Unlock()
 	s.AlURLStorage[alias] = url //TODO: mb I should somehow handle that?
 	return 1, nil               // blind plug
@@ -60,7 +59,7 @@ func (s *Storage) GetOrURLByAl(_ context.Context, alias string) (string, error) 
 }
 
 // GetDataByUserID - a blind plug
-func (s *Storage) GetDataByUserId(ctx context.Context, userId string) (*[]models.UserURLS, error) {
+func (s *Storage) GetDataByUserID(ctx context.Context, _ string) (*[]models.UserURLS, error) {
 	return nil, nil
 }
 

@@ -34,9 +34,8 @@ func NewStorage(filename string, logger *zap.Logger) *Storage {
 	}
 }
 
-func (s *Storage) StoreAlURL(_ context.Context, alias string, orURL string, userId string) (int64, error) {
+func (s *Storage) StoreAlURL(_ context.Context, alias string, orURL string, _ string) (int64, error) {
 	s.mx.Lock()
-	userId = userId //TODO: continue?
 	defer s.mx.Unlock()
 	s.AlURLStorage[alias] = orURL
 	if err := saveStorage(s.Filename, s); err != nil {
@@ -47,7 +46,7 @@ func (s *Storage) StoreAlURL(_ context.Context, alias string, orURL string, user
 }
 
 // GetDataByUserID - a blind plug
-func (s *Storage) GetDataByUserId(ctx context.Context, userId string) (*[]models.UserURLS, error) {
+func (s *Storage) GetDataByUserID(ctx context.Context, userID string) (*[]models.UserURLS, error) {
 	return nil, nil
 }
 
