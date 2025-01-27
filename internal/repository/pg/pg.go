@@ -79,25 +79,16 @@ func (s *Storage) StoreAlURL(ctx context.Context, alias string, url string, user
 		// TODO: what does it actually mean???
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-			fmt.Println("if errors.As(err, &pgErr) && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code)")
 			if pgErr.Code == pgerrcode.UniqueViolation { // if we have the try to short existed url
-				fmt.Println("if pgErr.Code == pgerrcode.UniqueViolation ")
-				fmt.Println("2. alias = ", alias)
-				//existedAlias, err := s.GetAlByURL(ctx, url)
-				//if err != nil {
-				//	return 0, err
-				//}
 				err = merrors.ErrURLOrAliasExists // TODO [MENTOR]: is it OK way ?
 				return 0, err
-				//return 0, &models.ExistsURLError{ // TODO [MENTOR] Delete the model
-				//	ExistedAlias: existedAlias,
-				//	Err:          merrors.ErrURLOrAliasExists,
+
 			}
 		}
-		//err = merrors.ErrURLOrAliasExists
+
 	}
 	return 0, nil
-	//return 0, fmt.Errorf("%s: %w", op, err)
+
 }
 
 // TODO [Mentor]: LastInsertId is not supported by this driver, should I use 0 or change the driver?
