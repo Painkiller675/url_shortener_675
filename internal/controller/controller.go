@@ -102,7 +102,7 @@ func (c *Controller) retrieveUserIDFromTokenString(r *http.Request) string { // 
 
 }
 
-func (с *Controller) setAuthToken(w http.ResponseWriter, tokenStr string) {
+func (c *Controller) setAuthToken(w http.ResponseWriter, tokenStr string) {
 
 	http.SetCookie(w, &http.Cookie{
 		Name:    "token",
@@ -115,11 +115,6 @@ func (с *Controller) setAuthToken(w http.ResponseWriter, tokenStr string) {
 func (c *Controller) CreateShortURLHandler() http.HandlerFunc {
 	return func(res http.ResponseWriter, req *http.Request) {
 		const op = "controller.CreateSHortURLHandler"
-		// http.SetCookie(w, &http.Cookie{
-		//		Name:    "token",
-		//		Value:   tokenStr,
-		//		Expires: time.Now().Add(fiveMinutes * time.Minute),
-		//	})
 
 		body, err := io.ReadAll(req.Body)
 		//check the body
